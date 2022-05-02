@@ -1,0 +1,24 @@
+{
+  "name": "11-notetaker",
+  "version": "1.0.0",
+  "description": "Assignment for unit 11",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KIMOISQUIGGLES/11-NoteTaker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KIMOISQUIGGLES/11-NoteTaker/issues"
+  },
+  "homepage": "https://github.com/KIMOISQUIGGLES/11-NoteTaker#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
