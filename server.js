@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const util = require('util');
-
+const { v4: uuidv4 } = require('uuid');
 
 const PORT = 3001;
 // DECLARE VARIABLE FOR EXPRESS
@@ -21,10 +21,15 @@ app.get('/', (req, res) =>
     res.sendFile(path.join(__dirname, '/public/index.html'))
 );
 
+// ROUTE FOR NOTES PAGE
+app.get('/notes', (req, res) => 
+    res.sendFile(path.join(__dirname, '/public/notes.html'))
+);
+
 // MAKE PROMISE VERSION OF FS.READFILE
 const readFromFile = util.promisify(fs.readFile);
 
-// MAKE PROMISE VERSION OF FS.WRITEFILE
+// FS.WRITEFILE
 const writeToFile = (destination, content) =>
     fs.writeFile(destination, JSON.stringify(content, null, 4), (err) =>
         err ? console.error(err) : console.info(`\nData written to ${destination}`)
@@ -50,7 +55,7 @@ app.get('/api/notes', (req, res) =>
 );
 
 // POST ROUTE
-app.post('/api/tips', (req, res) => {
+app.post('/api/notes', (req, res) => {
     const {title, text} = req.body;
 
     // IF ALL REQUIRED PROPERTIES ARE PRESENT
@@ -58,7 +63,8 @@ app.post('/api/tips', (req, res) => {
         // VARIABLE FOR NEW SAVED NOTE
         const newNote = {
             title,
-            text
+            text,
+            id: uuidv4()
         };
 
         readAndAppend(newNote, './db/db.json')
@@ -72,6 +78,21 @@ app.post('/api/tips', (req, res) => {
     }
 });
 
+// DELETE ROUTE
+
+app.delete('/api/notes/:id', (req, res) => {
+    readFromFile('./db/db.json').then((data) => {
+        const notes = JSON.parse(data);
+        // FILTER NOTES, KEEP EVERYTHING THAT DOES NOT MATCH ID
+        const updateNote = notes.filter(note => note.id != req.params.id)
+        // REWRITE FILE, WITH UPDATED DATA
+        fs.writeFile('./db/db.json', JSON.stringify(updateNote, null, 4), (err) =>
+        err ? console.error(err) : res.send(200)
+        );
+    })
+    
+});
+
 
 app.listen(PORT, () => {
     console.log(`App listening at http://localhost:${PORT}`);
@@ -79,5 +100,5 @@ app.listen(PORT, () => {
 
 // WILDCARD ROUTE TO 404
 app.get('*', function(req, res){
-    res.sendFile(path.join(__dirname, '/public/pages/404.html'))
+    res.sendFile(path.join(__dirname, '/public/index.html'))
 });
